@@ -1,0 +1,5 @@
+---
+source: src/graphs/kosaraju.rs
+expression: sort_for_test(kosaraju(input))
+---
+- - 0

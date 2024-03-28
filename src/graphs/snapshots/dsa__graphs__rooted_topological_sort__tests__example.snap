@@ -1,0 +1,18 @@
+---
+source: src/graphs/rooted_topological_sort.rs
+expression: result
+---
+- - 0
+  - arthas
+- - 1
+  - anubarak
+- - 2
+  - commander2
+- - 3
+  - acolyte1
+- - 1
+  - sylvanas
+- - 2
+  - commander1
+- - 3
+  - acolyte2
