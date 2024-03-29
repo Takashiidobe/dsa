@@ -99,6 +99,8 @@ impl<T> BkTree<T> {
 
 #[cfg(test)]
 mod tests {
+    use quickcheck_macros::quickcheck;
+
     use super::*;
     use crate::distances::levenshtein::levenshtein_distance;
 
@@ -114,5 +116,16 @@ mod tests {
         let (words, dists): (Vec<&str>, Vec<usize>) = bk.find("bo", 2).into_iter().unzip();
         assert_eq!(words, ["book", "boo", "boon"]);
         assert_eq!(dists, [2, 1, 2]);
+    }
+
+    #[quickcheck]
+    fn dont_crash(inputs: Vec<String>, search: (String, usize)) -> bool {
+        let mut bk = BkTree::new(levenshtein_distance);
+        for word in inputs {
+            bk.insert(word);
+        }
+
+        bk.find(search.0, search.1);
+        true
     }
 }
