@@ -175,6 +175,7 @@ version = "0.1.0"
 dependencies = [
  "arbitrary",
  "insta",
+ "num-traits",
  "quickcheck",
  "quickcheck_macros",
  "serde",
