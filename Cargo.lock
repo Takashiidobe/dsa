@@ -45,6 +45,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bytemuck"
+version = "1.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d6d68c57235a3a081186990eca2867354726650f42f7516ca50c28d6281fd15"
+
+[[package]]
 name = "camino"
 version = "1.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -174,6 +180,7 @@ name = "dsa"
 version = "0.1.0"
 dependencies = [
  "arbitrary",
+ "bytemuck",
  "insta",
  "num-traits",
  "quickcheck",
