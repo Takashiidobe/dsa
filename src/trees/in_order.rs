@@ -21,7 +21,7 @@ mod tests {
 
     #[test]
     fn ex() {
-        let tree = btree![1, 2, 3];
+        let tree = btree![2, 1, 3];
 
         assert_eq!(in_order(&tree), vec![1, 2, 3]);
     }

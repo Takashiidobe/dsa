@@ -90,25 +90,22 @@ impl Qoi {
             Some(output) => output,
         };
 
-        match self.colors.has_alpha() {
-            true => {
-                Self::decode_range::<4>(
-                    &mut [Pixel::new(); 64],
-                    &mut Pixel::new_opaque(),
-                    &mut 0,
-                    bytes,
-                    output,
-                )?;
-            }
-            false => {
-                Self::decode_range::<3>(
-                    &mut [Pixel::new(); 64],
-                    &mut Pixel::new_opaque(),
-                    &mut 0,
-                    bytes,
-                    output,
-                )?;
-            }
+        if self.colors.has_alpha() {
+            Self::decode_range::<4>(
+                &mut [Pixel::new(); 64],
+                &mut Pixel::new_opaque(),
+                &mut 0,
+                bytes,
+                output,
+            )?;
+        } else {
+            Self::decode_range::<3>(
+                &mut [Pixel::new(); 64],
+                &mut Pixel::new_opaque(),
+                &mut 0,
+                bytes,
+                output,
+            )?;
         }
         Ok(())
     }
