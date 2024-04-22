@@ -1,19 +1,28 @@
 // From the Bk_tree crate: https://github.com/IGI-111/bktree
 use std::collections::VecDeque;
 
+//@ A Bktree is a data structure for searching in discrete metric spaces. It can be used for
+//@ approximate string matching, a.k.a. fuzzy searching.
+
+//@ Every BkTree Node has a word and a set of children. The children also have a `usize` variable
+//@ which show their distance from the Node.
 struct Node<T> {
     word: T,
     children: Vec<(usize, Node<T>)>,
 }
 
+//@ A definition of a distance function.
 pub type DistanceFn<T> = dyn Fn(&T, &T) -> usize;
 
+//@ A Bktree has a root node and a distance function, which it uses to calculate distances between
+//@ words.
 pub struct BkTree<T> {
     root: Option<Box<Node<T>>>,
     dist: Box<DistanceFn<T>>,
 }
 
 impl<T> BkTree<T> {
+    //@ creating a new BKTree requires just the distance function passed in.
     pub fn new(dist_fn: impl Fn(&T, &T) -> usize + 'static) -> Self {
         Self {
             root: None,
@@ -21,26 +30,29 @@ impl<T> BkTree<T> {
         }
     }
 
+    //@ To insert a node
     pub fn insert(&mut self, val: T) {
         match &mut self.root {
+            //@ If there is a root:
             Some(root) => {
                 let mut root = &mut **root;
                 loop {
+                    //@ calculate the distance of root to this word we want to insert.
                     let k = (self.dist)(&root.word, &val);
-                    // distance of 0 = same word
+                    //@ if the distance is 0, we can ignore this word since it is a duplicate.
                     if k == 0 {
                         return;
                     }
 
-                    // find children with distance equal to k
+                    //@ find children with distance equal to k
                     let v = root.children.iter().position(|(dist, _)| *dist == k);
                     match v {
-                        // if we found a match, we set the root to that position's node.
+                        //@ if we found a match, we set the root to that position's node.
                         Some(pos) => {
                             root = &mut root.children[pos].1;
                         }
-                        // if there are no matches, create a new child with distance k and this
-                        // node
+                        //@ if there are no matches, create a new child with distance k and this
+                        //@ node
                         None => {
                             root.children.push((
                                 k,
@@ -54,7 +66,7 @@ impl<T> BkTree<T> {
                     }
                 }
             }
-            // if the root does not exist, this node is the root.
+            //@ if there is no root, this node is the root node.
             None => {
                 self.root = Some(Box::new(Node {
                     word: val,
@@ -64,8 +76,10 @@ impl<T> BkTree<T> {
         }
     }
 
+    //@ To find a node, we require a value and a maximum distance to search for.
     pub fn find(&self, val: T, max_dist: usize) -> Vec<(&T, usize)> {
         match self.root {
+            //@ we search through the root
             Some(ref root) => {
                 let mut matches = vec![];
 
@@ -73,15 +87,16 @@ impl<T> BkTree<T> {
 
                 candidates.push_back(root);
 
-                // starting at the root, bfs through its children
+                //@ starting at the root, bfs through its children
                 while let Some(n) = candidates.pop_front() {
+                    //@ calculating each node's distance from the root
                     let distance = (self.dist)(&n.word, &val);
-                    // if the distance matches, add it to the match
+                    //@ if the distance is less than the allowed distance, add it to the match
                     if distance <= max_dist {
                         matches.push((&n.word, distance));
                     }
 
-                    // add any children that have <= distance than this candidate.
+                    //@ add any children of this node that have <= distance than this candidate.
                     candidates.extend(
                         n.children
                             .iter()
@@ -92,6 +107,7 @@ impl<T> BkTree<T> {
 
                 matches
             }
+            //@ If there are no nodes, there are no matches.
             None => vec![],
         }
     }

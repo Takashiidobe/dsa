@@ -1,7 +1,11 @@
 //@ This library shows tested implementations of common data structures and algorithms
+//@ ## Primitive
+//@ - [Parity of Bits](./primitive/parity.html)
 //@ ## Graphs
 //@ - [Kosaraju's Algorithm](./graphs/kosaraju.html)
 //@ - [Topological Sort](./graphs/rooted_topological_sort.html)
+//@ ## Trees
+//@ - [BK Trees](./trees/bk_tree.html)
 #![feature(test)]
 #![allow(unused)]
 

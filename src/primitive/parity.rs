@@ -2,7 +2,8 @@ use lazy_static::lazy_static;
 
 //@ count the number of even/odd bits
 //@ Takes O(n) time, where n is the width of the word
-//@ test primitive::parity::tests::bench_parity1 ... bench:     300,663 ns/iter (+/- 8,471)
+//@ Also somewhat slow:
+//@ `test primitive::parity::tests::bench_parity1 ... bench:     300,663 ns/iter (+/- 8,471)`
 pub fn parity1(mut x: u64) -> u64 {
     let mut result = 0;
     while x > 0 {
@@ -13,9 +14,8 @@ pub fn parity1(mut x: u64) -> u64 {
 }
 
 //@ Takes O(k) time, where k is the number of bits set to 1 (can be n).
-//@ The book says this is faster, so I benchmarked it from 0..=u16::MAX
-//@ test primitive::parity::tests::bench_parity2 ... bench:     177,997 ns/iter (+/- 3,596)
-//@ Since the bit patterns repeat anyway, this benchmark is comprehensive. Parity 2 is much better.
+//@ The book says this is faster, and on my computer it is.
+//@ `test primitive::parity::tests::bench_parity2 ... bench:     177,997 ns/iter (+/- 3,596)`
 pub fn parity2(mut x: u64) -> u64 {
     let mut result = 0;
     while x > 0 {
@@ -43,7 +43,7 @@ lazy_static! {
 
 //@ This method uses a lookup table and is a bit faster.
 //@ This also seems to be a bit faster.
-//@ test primitive::parity::tests::bench_parity3 ... bench:     120,589 ns/iter (+/- 1,362)
+//@ `test primitive::parity::tests::bench_parity3 ... bench:     120,589 ns/iter (+/- 1,362)`
 pub fn parity3(x: u64) -> u64 {
     PRECOMPUTED_PARITY[(x & BIT_MASK) as usize]
         ^ PRECOMPUTED_PARITY[(x >> 16 & BIT_MASK) as usize]
@@ -51,8 +51,8 @@ pub fn parity3(x: u64) -> u64 {
         ^ PRECOMPUTED_PARITY[(x >> 48 & BIT_MASK) as usize]
 }
 
-//@ This one is O(log(n)) time.
-//@ test primitive::parity::tests::bench_parity4 ... bench:      61,933 ns/iter (+/- 514)
+//@ This one is O(log(n)) time, since it divides and conquers the input.
+//@ `test primitive::parity::tests::bench_parity4 ... bench:      61,933 ns/iter (+/- 514)`
 pub fn parity4(mut x: u64) -> u64 {
     x ^= x >> 32;
     x ^= x >> 16;
@@ -64,8 +64,8 @@ pub fn parity4(mut x: u64) -> u64 {
     x & 0x1
 }
 
-//@ Using the intrinsics builtin
-//@ test primitive::parity::tests::bench_parity5 ... bench:      53,765 ns/iter (+/- 10,017)
+//@ Using the intrinsics builtin. This is the fastest by far.
+//@ `test primitive::parity::tests::bench_parity5 ... bench:      53,765 ns/iter (+/- 10,017)`
 pub fn parity5(x: u64) -> u64 {
     x.count_ones() as u64
 }
