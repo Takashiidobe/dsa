@@ -1,6 +1,3 @@
-#[cfg(test)]
-use serde::Serialize;
-
 fn merge<T: Ord + Clone>(arr: &mut [T], mid: usize) {
     let left_half = arr[..mid].to_vec();
     let right_half = arr[mid..].to_vec();
@@ -36,6 +33,7 @@ pub fn merge_sort<T: Ord + Clone>(arr: &mut [T]) {
             let mid = arr.len() / 2;
             merge_sort(&mut arr[..mid]);
             merge_sort(&mut arr[mid..]);
+
             merge(arr, mid);
         }
     }
@@ -44,11 +42,22 @@ pub fn merge_sort<T: Ord + Clone>(arr: &mut [T]) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::PEAK_ALLOC;
     use quickcheck_macros::quickcheck;
+    use serde::Serialize;
 
-    #[test_fuzz::test_fuzz(generic_args = "i32")]
-    fn _merge_sort<T: Ord + Clone + Serialize>(arr: &mut [T]) {
-        merge_sort(arr)
+    #[test]
+    fn memory_usage_merge_sort() {
+        let mut vec_to_sort: Vec<i32> = (0..=10000).rev().collect();
+        merge_sort(&mut vec_to_sort);
+        println!("{}", PEAK_ALLOC.peak_usage());
+    }
+
+    #[test]
+    fn memory_usage_sort() {
+        let mut vec_to_sort: Vec<i32> = (0..=10000).rev().collect();
+        vec_to_sort.sort_unstable();
+        println!("{}", PEAK_ALLOC.peak_usage());
     }
 
     fn is_sorted<T>(arr: &mut [T]) -> bool
@@ -72,7 +81,7 @@ mod tests {
 
     #[quickcheck]
     fn merge_sort_is_sorted(mut arr: Vec<i32>) -> bool {
-        _merge_sort(&mut arr);
+        merge_sort(&mut arr);
         is_sorted(&mut arr)
     }
 }

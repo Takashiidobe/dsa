@@ -41,9 +41,8 @@ pub fn minimum_cost(n: u32, connections: Vec<(u32, u32, u32)>) -> Option<u32> {
 
 #[cfg(test)]
 mod tests {
-    use quickcheck_macros::quickcheck;
-
     use super::minimum_cost;
+    use quickcheck_macros::quickcheck;
 
     #[test]
     fn ex1() {
@@ -54,6 +53,13 @@ mod tests {
 
     #[test]
     fn ex2() {
+        let res = minimum_cost(4, vec![(1, 2, 3), (3, 4, 4)]);
+
+        assert_eq!(res, None);
+    }
+
+    #[test]
+    fn ex3() {
         let res = minimum_cost(4, vec![(1, 2, 3), (3, 4, 4)]);
 
         assert_eq!(res, None);

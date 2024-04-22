@@ -19,8 +19,8 @@ pub fn levenshtein_distance<S: AsRef<str>>(a: &S, b: &S) -> usize {
 
     let mut res = 0;
     let mut cache: Vec<usize> = (1..).take(a_len).collect();
-    let mut a_dist;
-    let mut b_dist;
+    let mut a_dist = 0;
+    let mut b_dist = 0;
 
     for (ib, cb) in b.chars().enumerate() {
         res = ib;

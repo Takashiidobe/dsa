@@ -1,10 +1,13 @@
 use std::collections::{HashMap, VecDeque};
 
+//@ This function prints out a topological sort of a company.
+//@ This function works for any DAG where there is one root node which can have many children.
 pub fn rooted_topological_sort(chart: &[(u32, u32, String)]) -> Option<Vec<(u64, String)>> {
     let mut emp_to_mgr: HashMap<u32, u32> = HashMap::new();
     let mut mgr_to_emp: HashMap<u32, Vec<u32>> = HashMap::new();
     let mut emp_to_name: HashMap<u32, String> = HashMap::new();
 
+    //@ We start out without having found the CEO.
     let mut ceo = None;
 
     for (emp_id, mgr_id, name) in chart {
@@ -17,6 +20,7 @@ pub fn rooted_topological_sort(chart: &[(u32, u32, String)]) -> Option<Vec<(u64,
         emp_to_name.insert(*emp_id, name.to_string());
     }
 
+    //@ If we can't find a CEO, then there's no way to continue
     ceo?;
 
     let mut q = VecDeque::new();
@@ -41,10 +45,12 @@ pub fn rooted_topological_sort(chart: &[(u32, u32, String)]) -> Option<Vec<(u64,
 mod tests {
     use super::*;
     use insta::assert_yaml_snapshot;
+    use quickcheck_macros::quickcheck;
 
-    #[test_fuzz::test_fuzz]
-    fn _rooted_topological_sort(chart: &[(u32, u32, String)]) -> Option<Vec<(u64, String)>> {
-        rooted_topological_sort(chart)
+    #[quickcheck]
+    fn verify(chart: Vec<(u32, u32, String)>) -> bool {
+        rooted_topological_sort(&chart);
+        true
     }
 
     #[test]
