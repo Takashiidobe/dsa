@@ -1,6 +1,8 @@
 //@ This library shows tested implementations of common data structures and algorithms
 //@ ## Primitive
 //@ - [Parity of Bits](./primitive/parity.html)
+//@ ## Strings
+//@ - [Copy on Write](./strings/copy_on_write.html)
 //@ ## Graphs
 //@ - [Kosaraju's Algorithm](./graphs/kosaraju.html)
 //@ - [Topological Sort](./graphs/rooted_topological_sort.html)

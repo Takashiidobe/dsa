@@ -10,34 +10,46 @@ pub fn rooted_topological_sort(chart: &[(u32, u32, String)]) -> Option<Vec<(u64,
     //@ We start out without having found the CEO.
     let mut ceo = None;
 
+    //@ For every employee in the chart
     for (emp_id, mgr_id, name) in chart {
+        //@ If they manage themselves, they're the CEO.
         if emp_id == mgr_id {
             ceo = Some(emp_id);
         } else {
+            //@ Otherwise, we add the employee as a subordinate to their manager
             mgr_to_emp.entry(*mgr_id).or_default().push(*emp_id);
+            //@ And add their manager to the employee.
             emp_to_mgr.insert(*emp_id, *mgr_id);
         }
+        //@ We then maintain a mapping of employee to name for faster lookup.
         emp_to_name.insert(*emp_id, name.to_string());
     }
 
     //@ If we can't find a CEO, then there's no way to continue
     ceo?;
 
+    //@ Next, we bfs through the org chart, starting with the CEO
     let mut q = VecDeque::new();
     q.push_back((ceo.unwrap(), 0));
 
     let mut res = vec![];
 
+    //@ While we have employees to process
     while let Some((emp_id, depth)) = q.pop_front() {
+        //@ we push the employee and its depth to the result
         res.push((depth, emp_to_name[emp_id].clone()));
 
+        //@ then, for this employee's subordinates (if there are any)
         if let Some(reports) = mgr_to_emp.get(emp_id) {
+            //@ We add them to the front of the queue, since we want to process them before other
+            //@ peer employees.
             for report_id in reports {
                 q.push_front((report_id, depth + 1));
             }
         }
     }
 
+    //@ And then we return the collection.
     Some(res)
 }
 
