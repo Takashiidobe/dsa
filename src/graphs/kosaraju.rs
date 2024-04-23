@@ -38,14 +38,12 @@ pub fn kosaraju(graph: HashMap<u32, Vec<u32>>) -> HashMap<u32, Vec<u32>> {
 
     //@ 3. the algorithm creates a visit function, which is called on every node in the graph.
     //@ `Visit(node)` is a recursive function that does the following:
-    //@  ```
-    //@  If `node` is not in the visited set:
-    //@      Add `node` to `visited`.
-    //@      For each outdegree of node, call `visit(outdegree)`.
-    //@      Prepend node to `l`.
-    //@  Else:
-    //@      Do nothing
-    //@  ```
+    //@  - If `node` is not in the visited set:
+    //@     - Add `node` to `visited`.
+    //@     - For each outdegree of node, call `visit(outdegree)`.
+    //@     - Prepend node to `l`.
+    //@  - Else:
+    //@     - Do nothing
     fn visit(
         node: u32,
         visited: &mut HashSet<u32>,
@@ -69,12 +67,12 @@ pub fn kosaraju(graph: HashMap<u32, Vec<u32>>) -> HashMap<u32, Vec<u32>> {
 
     //@ 4. the algorithm creates an assign function, which is called on every node in l in order.
     //@ `Assign(node, root)` is a recursive function that does the following:
-    //@     If a `node` is not in the assigned set:
-    //@         Add `node` to `assigned`.
-    //@         Assign `node` to `root`'s SCC.
-    //@         For each indegree of node, call `assign(indegree, root)`.
-    //@     Else:
-    //@         Do nothing
+    //@  - If a `node` is not in the assigned set:
+    //@     - Add `node` to `assigned`.
+    //@     - Assign `node` to `root`'s SCC.
+    //@     - For each indegree of node, call `assign(indegree, root)`.
+    //@  - Else:
+    //@     - Do nothing
     fn assign(
         node: u32,
         root: u32,

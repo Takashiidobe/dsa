@@ -1,3 +1,4 @@
+pub mod avl;
 pub mod bk_tree;
 pub mod fenwick;
 pub mod in_order;

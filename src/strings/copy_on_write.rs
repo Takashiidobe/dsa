@@ -1,4 +1,7 @@
-use std::{borrow::Borrow, fmt};
+use std::{
+    borrow::Borrow,
+    fmt::{self, Debug},
+};
 
 //@ A CopyOnWrite can be in either of two states:
 pub enum CopyOnWrite<'a, B: 'a>
@@ -54,14 +57,14 @@ impl<B: ToOwned> CopyOnWrite<'_, B> {
     }
 }
 
-impl<B> fmt::Debug for CopyOnWrite<'_, B>
+impl<B> Debug for CopyOnWrite<'_, B>
 where
-    B: fmt::Debug + ToOwned<Owned: fmt::Debug>,
+    B: Debug + ToOwned<Owned: Debug>,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            Borrowed(ref b) => fmt::Debug::fmt(b, f),
-            Owned(ref o) => fmt::Debug::fmt(o, f),
+            Borrowed(ref b) => Debug::fmt(b, f),
+            Owned(ref o) => Debug::fmt(o, f),
         }
     }
 }

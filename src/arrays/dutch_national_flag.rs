@@ -1,33 +1,10 @@
 use quickcheck::{Arbitrary, Gen};
-use rand::{
-    distributions::{Distribution, Standard},
-    Rng,
-};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Copy)]
 pub enum Color {
     Red,
     White,
     Blue,
-}
-
-impl Distribution<Color> for Standard {
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Color {
-        match rng.gen_range(0..=2) {
-            0 => Color::Red,
-            1 => Color::White,
-            _ => Color::Blue,
-        }
-    }
-}
-
-impl Arbitrary for Color {
-    fn arbitrary(g: &mut Gen) -> Self {
-        match g.choose(&[Color::Red, Color::White, Color::Blue]) {
-            Some(&color) => color,
-            _ => unreachable!(),
-        }
-    }
 }
 
 pub fn dutch_flag_partition(flag: &[Color]) -> Vec<Color> {
@@ -96,10 +73,32 @@ pub fn dutch_flag_sort_inplace(flag: &mut [Color]) {
 mod tests {
     use lazy_static::lazy_static;
     use quickcheck_macros::quickcheck;
-    use rand::Rng;
+    use rand::{
+        distributions::{Distribution, Standard},
+        Rng,
+    };
     use test::Bencher;
 
     use super::*;
+
+    impl Distribution<Color> for Standard {
+        fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Color {
+            match rng.gen_range(0..=2) {
+                0 => Color::Red,
+                1 => Color::White,
+                _ => Color::Blue,
+            }
+        }
+    }
+
+    impl Arbitrary for Color {
+        fn arbitrary(g: &mut Gen) -> Self {
+            match g.choose(&[Color::Red, Color::White, Color::Blue]) {
+                Some(&color) => color,
+                _ => unreachable!(),
+            }
+        }
+    }
 
     lazy_static! {
         static ref FLAGS: Vec<Vec<Color>> = {

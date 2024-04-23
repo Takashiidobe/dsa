@@ -7,13 +7,14 @@
 //@ - [Kosaraju's Algorithm](./graphs/kosaraju.html)
 //@ - [Topological Sort](./graphs/rooted_topological_sort.html)
 //@ ## Trees
+//@ - [Fenwick Trees](./trees/fenwick.html)
 //@ - [BK Trees](./trees/bk_tree.html)
 #![feature(test)]
 #![allow(unused)]
 
 use peak_alloc::PeakAlloc;
 
-#[global_allocator]
+#[cfg_attr(test, global_allocator)]
 static PEAK_ALLOC: PeakAlloc = PeakAlloc;
 
 #[cfg(test)]
