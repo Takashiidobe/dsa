@@ -21,6 +21,7 @@ static PEAK_ALLOC: PeakAlloc = PeakAlloc;
 extern crate test;
 
 pub mod arrays;
+pub mod basic;
 pub mod distances;
 pub mod graphs;
 pub mod images;
