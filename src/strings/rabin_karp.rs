@@ -2,6 +2,9 @@ pub fn rabin_karp(text: &str, pattern: &str) -> bool {
     if text.is_empty() && pattern.is_empty() {
         return true;
     }
+    if pattern.is_empty() {
+        return true;
+    }
     let (t_len, p_len) = (text.len(), pattern.len());
     //@ If either the pattern or text is empty or the pattern is longest than the text, there are
     //@ no possible matches, so return false.

@@ -11,7 +11,9 @@ pub fn two_sum<N: PrimInt + Hash>(nums: &[N], target: N) -> Option<(usize, usize
         match lookup.get(&offset) {
             Some(prev_i) => match offset.checked_add(num) {
                 Some(res) if res == target => return Some((*prev_i, i)),
-                _ => {}
+                _ => {
+                    lookup.insert(*num, i);
+                }
             },
             None => {
                 lookup.insert(*num, i);

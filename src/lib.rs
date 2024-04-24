@@ -1,6 +1,8 @@
 //@ This library shows tested implementations of common data structures and algorithms
 //@ ## Primitive
 //@ - [Parity of Bits](./primitive/parity.html)
+//@ ## Arrays
+//@ - [Shuffling](./arrays/shuffle.html)
 //@ ## Strings
 //@ - [Copy on Write](./strings/copy_on_write.html)
 //@ ## Graphs
