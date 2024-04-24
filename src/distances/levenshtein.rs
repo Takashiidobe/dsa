@@ -2,48 +2,81 @@ pub fn levenshtein_distance<S: AsRef<str>>(a: &S, b: &S) -> usize {
     let a = a.as_ref();
     let b = b.as_ref();
 
-    if a == b {
-        return 0;
+    let (len_a, len_b) = (a.len(), b.len());
+    let mut cost = 0;
+    let mut d = vec![vec![0; len_b + 1]; len_a + 1];
+
+    for i in 0..=len_a {
+        d[i][0] = i;
+    }
+    for j in 0..=len_b {
+        d[0][j] = j;
     }
 
-    let a_len = a.chars().count();
-    let b_len = a.chars().count();
-
-    if a_len == 0 {
-        return b_len;
-    }
-
-    if b_len == 0 {
-        return a_len;
-    }
-
-    let mut res = 0;
-    let mut cache: Vec<usize> = (1..).take(a_len).collect();
-    let mut a_dist = 0;
-    let mut b_dist = 0;
-
-    for (ib, cb) in b.chars().enumerate() {
-        res = ib;
-        a_dist = ib;
-        for (ia, ca) in a.chars().enumerate() {
-            b_dist = if ca == cb { a_dist } else { a_dist + 1 };
-            a_dist = cache[ia];
-
-            res = if a_dist > res {
-                if b_dist > res {
-                    res + 1
-                } else {
-                    b_dist
-                }
-            } else if b_dist > a_dist {
-                a_dist + 1
+    for i in 1..=len_a {
+        for j in 1..=len_b {
+            cost = if a.chars().nth(i - 1) == b.chars().nth(j - 1) {
+                0
             } else {
-                b_dist
+                1
             };
-
-            cache[ia] = res;
+            d[i][j] = *[
+                d[i - 1][j] + 1,        // deletion
+                d[i][j - 1] + 1,        // insertion
+                d[i - 1][j - 1] + cost, // substitution
+            ]
+            .iter()
+            .min()
+            .unwrap();
         }
     }
 
-    res
+    d[len_a][len_b]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use quickcheck_macros::quickcheck;
+
+    #[quickcheck]
+    fn prop_levenshtein_distance_symmetric(a: String, b: String) -> bool {
+        if a.len() > 50 || b.len() > 50 {
+            return true;
+        }
+        levenshtein_distance(&a, &b) == levenshtein_distance(&b, &a)
+    }
+
+    #[quickcheck]
+    fn prop_levenshtein_distance_identity(a: String) -> bool {
+        if a.len() > 50 {
+            return true;
+        }
+        levenshtein_distance(&a, &a) == 0
+    }
+
+    #[quickcheck]
+    fn prop_levenshtein_triangle_inequality(a: String, b: String, c: String) -> bool {
+        if a.len() > 50 || b.len() > 50 || c.len() > 50 {
+            return true;
+        }
+        levenshtein_distance(&a, &c) <= levenshtein_distance(&a, &b) + levenshtein_distance(&b, &c)
+    }
+
+    #[quickcheck]
+    fn prop_levenshtein_distance_positive(a: String, b: String) -> bool {
+        if a.len() > 50 || b.len() > 50 {
+            return true;
+        }
+        let distance = levenshtein_distance(&a, &b);
+        distance <= a.len().max(b.len())
+    }
+
+    #[quickcheck]
+    fn prop_levenshtein_distance_to_empty(a: String) -> bool {
+        if a.len() > 50 {
+            return true;
+        }
+        levenshtein_distance(&a, &"".to_string()) == a.len()
+    }
 }

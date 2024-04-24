@@ -36,8 +36,10 @@ impl<B: ToOwned> Clone for CopyOnWrite<'_, B> {
 }
 
 impl<B: ToOwned> CopyOnWrite<'_, B> {
+    //@ If we want a mutable version of the CoW
     pub fn to_mut(&mut self) -> &mut <B as ToOwned>::Owned {
         match self {
+            //@ If it is borrowed, we'll clone it and return that.
             Borrowed(borrowed) => {
                 *self = Owned(borrowed.to_owned());
                 match self {
@@ -45,6 +47,7 @@ impl<B: ToOwned> CopyOnWrite<'_, B> {
                     Owned(ref mut owned) => owned,
                 }
             }
+            //@ Otherwise, we already own a mutable copy, so hand that out.
             Owned(ref mut owned) => owned,
         }
     }

@@ -1,14 +1,20 @@
+use std::{
+    convert::From,
+    ops::{BitAnd, BitAndAssign, BitXorAssign, Shr, ShrAssign},
+};
+
 use lazy_static::lazy_static;
+use num_traits::PrimInt;
 
 //@ count the number of even/odd bits
 //@ Takes O(n) time, where n is the width of the word
 //@ Also somewhat slow:
 //@ `test primitive::parity::tests::bench_parity1 ... bench:     300,663 ns/iter (+/- 8,471)`
-pub fn parity1(mut x: u64) -> u64 {
-    let mut result = 0;
-    while x > 0 {
-        result ^= x & 1;
-        x >>= 1
+pub fn parity1<N: PrimInt + ShrAssign + BitXorAssign>(mut x: N) -> N {
+    let mut result = N::zero();
+    while x > N::zero() {
+        result ^= x & N::one();
+        x >>= N::one();
     }
     result
 }
@@ -16,44 +22,18 @@ pub fn parity1(mut x: u64) -> u64 {
 //@ Takes O(k) time, where k is the number of bits set to 1 (can be n).
 //@ The book says this is faster, and on my computer it is.
 //@ `test primitive::parity::tests::bench_parity2 ... bench:     177,997 ns/iter (+/- 3,596)`
-pub fn parity2(mut x: u64) -> u64 {
-    let mut result = 0;
-    while x > 0 {
-        result ^= x & 1;
-        x &= x - 1
+pub fn parity2<N: PrimInt + ShrAssign + BitXorAssign + BitAndAssign>(mut x: N) -> N {
+    let mut result = N::zero();
+    while x > N::zero() {
+        result ^= x & N::one();
+        x &= x - N::one();
     }
     result
 }
 
-const PRECOMPUTED_PARITY_SIZE: usize = 1 + (u16::MAX as usize);
-const BIT_MASK: u64 = 0xFFFF;
-
-//@ The precomputed parity table itself.
-lazy_static! {
-    static ref PRECOMPUTED_PARITY: [u64; PRECOMPUTED_PARITY_SIZE] = {
-        let mut precomputed_parity = [0; PRECOMPUTED_PARITY_SIZE];
-
-        for i in (0..).take(PRECOMPUTED_PARITY_SIZE) {
-            precomputed_parity[i] = i.count_ones() as u64;
-        }
-
-        precomputed_parity
-    };
-}
-
-//@ This method uses a lookup table and is a bit faster.
-//@ This also seems to be a bit faster.
-//@ `test primitive::parity::tests::bench_parity3 ... bench:     120,589 ns/iter (+/- 1,362)`
-pub fn parity3(x: u64) -> u64 {
-    PRECOMPUTED_PARITY[(x & BIT_MASK) as usize]
-        ^ PRECOMPUTED_PARITY[(x >> 16 & BIT_MASK) as usize]
-        ^ PRECOMPUTED_PARITY[(x >> 32 & BIT_MASK) as usize]
-        ^ PRECOMPUTED_PARITY[(x >> 48 & BIT_MASK) as usize]
-}
-
 //@ This one is O(log(n)) time, since it divides and conquers the input.
 //@ `test primitive::parity::tests::bench_parity4 ... bench:      61,933 ns/iter (+/- 514)`
-pub fn parity4(mut x: u64) -> u64 {
+pub fn parity3<N: PrimInt + BitXorAssign + BitAnd>(mut x: N) -> N {
     x ^= x >> 32;
     x ^= x >> 16;
     x ^= x >> 8;
@@ -61,21 +41,37 @@ pub fn parity4(mut x: u64) -> u64 {
     x ^= x >> 2;
     x ^= x >> 1;
 
-    x & 0x1
+    x & N::one()
 }
 
 //@ Using the intrinsics builtin. This is the fastest by far.
 //@ `test primitive::parity::tests::bench_parity5 ... bench:      53,765 ns/iter (+/- 10,017)`
-pub fn parity5(x: u64) -> u64 {
-    x.count_ones() as u64
+pub fn parity4<N: PrimInt + From<u32>>(mut x: N) -> N {
+    x.count_ones().into()
 }
 
 #[cfg(test)]
 mod tests {
     use crate::PEAK_ALLOC;
 
-    use super::{parity1, parity2, parity3, parity4, parity5};
+    use super::{parity1, parity2, parity3, parity4};
+    use quickcheck_macros::quickcheck;
     use test::{black_box, Bencher};
+
+    #[quickcheck]
+    fn parity1_is_correct(num: u64) -> bool {
+        parity1(num) == parity4(num)
+    }
+
+    #[quickcheck]
+    fn parity2_is_correct(num: u64) -> bool {
+        parity2(num) == parity4(num)
+    }
+
+    #[quickcheck]
+    fn parity3_is_correct(num: u64) -> bool {
+        parity3(num) == parity4(num)
+    }
 
     #[test]
     fn memory_usage_parity_1() {
@@ -105,14 +101,6 @@ mod tests {
     fn memory_usage_parity_4() {
         for i in 0..=u16::MAX {
             parity4(i as u64);
-        }
-        println!("{}", PEAK_ALLOC.peak_usage());
-    }
-
-    #[test]
-    fn memory_usage_parity_5() {
-        for i in 0..=u16::MAX {
-            parity5(i as u64);
         }
         println!("{}", PEAK_ALLOC.peak_usage());
     }
@@ -149,15 +137,6 @@ mod tests {
         b.iter(|| {
             for i in 0..=u16::MAX {
                 black_box(parity4(i as u64));
-            }
-        })
-    }
-
-    #[bench]
-    fn bench_parity5(b: &mut Bencher) {
-        b.iter(|| {
-            for i in 0..=u16::MAX {
-                black_box(parity5(i as u64));
             }
         })
     }
