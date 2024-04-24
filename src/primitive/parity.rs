@@ -1,6 +1,6 @@
 use std::{
     convert::From,
-    ops::{BitAnd, BitAndAssign, BitXorAssign, Shr, ShrAssign},
+    ops::{AddAssign, BitAnd, BitAndAssign, BitXorAssign, Shr, ShrAssign},
 };
 
 use lazy_static::lazy_static;
@@ -10,10 +10,10 @@ use num_traits::PrimInt;
 //@ Takes O(n) time, where n is the width of the word
 //@ Also somewhat slow:
 //@ `test primitive::parity::tests::bench_parity1 ... bench:     300,663 ns/iter (+/- 8,471)`
-pub fn parity1<N: PrimInt + ShrAssign + BitXorAssign>(mut x: N) -> N {
+pub fn count_bits<N: PrimInt + ShrAssign + AddAssign>(mut x: N) -> N {
     let mut result = N::zero();
     while x > N::zero() {
-        result ^= x & N::one();
+        result += x & N::one();
         x >>= N::one();
     }
     result
@@ -25,8 +25,8 @@ pub fn parity1<N: PrimInt + ShrAssign + BitXorAssign>(mut x: N) -> N {
 pub fn parity2<N: PrimInt + ShrAssign + BitXorAssign + BitAndAssign>(mut x: N) -> N {
     let mut result = N::zero();
     while x > N::zero() {
-        result ^= x & N::one();
-        x &= x - N::one();
+        result ^= N::one();
+        x &= (x - N::one());
     }
     result
 }
@@ -47,20 +47,24 @@ pub fn parity3<N: PrimInt + BitXorAssign + BitAnd>(mut x: N) -> N {
 //@ Using the intrinsics builtin. This is the fastest by far.
 //@ `test primitive::parity::tests::bench_parity5 ... bench:      53,765 ns/iter (+/- 10,017)`
 pub fn parity4<N: PrimInt + From<u32>>(mut x: N) -> N {
-    x.count_ones().into()
+    if x.count_ones() % 2 != 0 {
+        1.into()
+    } else {
+        0.into()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::PEAK_ALLOC;
 
-    use super::{parity1, parity2, parity3, parity4};
+    use super::{count_bits, parity2, parity3, parity4};
     use quickcheck_macros::quickcheck;
     use test::{black_box, Bencher};
 
     #[quickcheck]
-    fn parity1_is_correct(num: u64) -> bool {
-        parity1(num) == parity4(num)
+    fn count_bits_is_correct(num: u64) -> bool {
+        count_bits(num) as u32 == num.count_ones()
     }
 
     #[quickcheck]
@@ -74,9 +78,9 @@ mod tests {
     }
 
     #[test]
-    fn memory_usage_parity_1() {
+    fn memory_usage_count_bits() {
         for i in 0..=u16::MAX {
-            parity1(i as u64);
+            count_bits(i as u64);
         }
         println!("{}", PEAK_ALLOC.peak_usage());
     }
@@ -109,7 +113,7 @@ mod tests {
     fn bench_parity1(b: &mut Bencher) {
         b.iter(|| {
             for i in 0..=u16::MAX {
-                black_box(parity1(i as u64));
+                black_box(count_bits(i as u64));
             }
         })
     }

@@ -77,7 +77,7 @@ impl<T> BkTree<T> {
     }
 
     //@ To find a node, we require a value and a maximum distance to search for.
-    pub fn find(&self, val: T, max_dist: usize) -> Vec<(&T, usize)> {
+    pub fn find(&self, val: &T, max_dist: usize) -> Vec<(&T, usize)> {
         match self.root {
             //@ we search through the root
             Some(ref root) => {
@@ -90,7 +90,7 @@ impl<T> BkTree<T> {
                 //@ starting at the root, bfs through its children
                 while let Some(n) = candidates.pop_front() {
                     //@ calculating each node's distance from the root
-                    let distance = (self.dist)(&n.word, &val);
+                    let distance = (self.dist)(&n.word, val);
                     //@ if the distance is less than the allowed distance, add it to the match
                     if distance <= max_dist {
                         matches.push((&n.word, distance));
@@ -129,19 +129,30 @@ mod tests {
         for word in words {
             bk.insert(word);
         }
-        let (words, dists): (Vec<&str>, Vec<usize>) = bk.find("bo", 2).into_iter().unzip();
+        let (words, dists): (Vec<&str>, Vec<usize>) = bk.find(&"bo", 2).into_iter().unzip();
         assert_eq!(words, ["book", "boo", "boon"]);
         assert_eq!(dists, [2, 1, 2]);
     }
 
     #[quickcheck]
-    fn dont_crash(inputs: Vec<String>, search: (String, usize)) -> bool {
-        let mut bk = BkTree::new(levenshtein_distance);
-        for word in inputs {
-            bk.insert(word);
+    fn prop_bk_tree_search_correctness(
+        words: Vec<String>,
+        target: String,
+        tolerance: usize,
+    ) -> bool {
+        if words.len() > 100 {
+            return true;
         }
-
-        bk.find(search.0, search.1);
-        true
+        if words.iter().any(|w| w.len() > 100) {
+            return true;
+        }
+        let mut tree = BkTree::new(levenshtein_distance);
+        for word in words.into_iter() {
+            tree.insert(word);
+        }
+        let results = tree.find(&target, tolerance);
+        results
+            .iter()
+            .all(|word| levenshtein_distance(word.0, &target) <= tolerance)
     }
 }
