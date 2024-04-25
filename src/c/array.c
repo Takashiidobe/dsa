@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// A definition of an either enum
 enum EitherSide {
   Left,
   Right,

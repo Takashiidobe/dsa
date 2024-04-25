@@ -1,6 +1,10 @@
 # DSA
 
-Some implementations of data structures and algorithms in Rust.
+Some implementations of data structures and algorithms in Rust,
+implemented in a literate programming style.
+
+To see the generated documentation online, go to: <dsa.takashiidobe.com>
+
 Currently using a fork of
 [`pycco`](https://github.com/Takashiidobe/pycco) with support for rust.
 

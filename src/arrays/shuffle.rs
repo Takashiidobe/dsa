@@ -22,13 +22,14 @@ mod tests {
     use itertools::Itertools;
     use quickcheck_macros::quickcheck;
 
-    use super::sample;
+    use super::*;
 
     //@ Note that it's not possible to unit test a shuffling function
     //@ because there's no simple way to map input to output:
     //@ i.e. One shuffle should ideally be as likely as any other permutation
     //@ so we could run the unit test (n!) times, and check that the distribution rolls each
     //@ permutation once, but it's extremely unlikely that the unit test passes.
+    //@ ```rust
     //@ #[test]
     //@ fn example() {
     //@     let mut input = &[5, 6, 7, 8, 9, 1, 2, 3, 4];
@@ -36,6 +37,7 @@ mod tests {
     //@     sample(&mut cloned);
     //@     assert_ne!(&cloned, input); This won't always pass
     //@ }
+    //@ ```
 
     //@ To test this function, we know the ideal outcome (the number of trials / permutations)
     //@ we can then give the permutations and some fixed error (0.05) to a function that will
@@ -56,7 +58,7 @@ mod tests {
 
         let num_samples = 10000;
         for _ in 0..num_samples {
-            sample(&mut input);
+            shuffle(&mut input);
             *permutations.entry(input.clone()).or_insert(0) += 1;
         }
 
