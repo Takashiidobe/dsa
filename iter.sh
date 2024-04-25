@@ -13,3 +13,5 @@ find src/ -type f \( -name "*.rs" -o -name "*.c" \) | while IFS= read -r f; do
     fi
 done
 
+# copy the lib.html file to index.html
+cp docs/src/lib.html docs/src/index.html
