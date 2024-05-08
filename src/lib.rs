@@ -3,6 +3,7 @@
 //@ - [Parity of Bits](./primitive/parity.html)
 //@ ## Arrays
 //@ - [Shuffling](./arrays/shuffle.html)
+//@ - [Sampling](./arrays/sample.html)
 //@ ## Strings
 //@ - [Copy on Write](./strings/copy_on_write.html)
 //@ ## Graphs

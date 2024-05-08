@@ -2,8 +2,8 @@ use rand::Rng;
 
 //@ To shuffle an array:
 //@ 1. We iterate through the array provided once.
-//@ 2. and choose a random number from our current index to the last index of the array,
-//@ 3. And then we swap them. We do this N times.
+//@     - and choose a random number from our current index to the last index of the array,
+//@     - And then we swap them. We do this N times.
 pub fn shuffle<T>(a: &mut [T]) {
     let mut trng = rand::thread_rng();
     for i in 0..a.len() {
@@ -56,7 +56,7 @@ mod tests {
             permutations.insert(perm, 0);
         }
 
-        let num_samples = 10000;
+        let num_samples = 100000;
         for _ in 0..num_samples {
             shuffle(&mut input);
             *permutations.entry(input.clone()).or_insert(0) += 1;
@@ -71,6 +71,6 @@ mod tests {
             })
             .sum();
 
-        chi_squared < 35.17
+        chi_squared < 13.09
     }
 }

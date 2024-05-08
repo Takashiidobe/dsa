@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn test() {
         //@ it takes some sample
-        let mut nums = vec![1, 2, 3, 4, 5].into_iter();
+        let mut nums = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10].into_iter();
         let res = sample(nums, 3);
         assert_ne!(vec![1, 2, 3], res);
     }
@@ -74,7 +74,7 @@ mod tests {
             permutations.insert(perm, 0);
         }
 
-        let num_samples = 10000;
+        let num_samples = 100000;
         for _ in 0..num_samples {
             sample(&mut input, 3);
             *permutations.entry(input.clone()).or_insert(0) += 1;
@@ -89,6 +89,6 @@ mod tests {
             })
             .sum();
 
-        chi_squared < 35.17
+        chi_squared < 13.09
     }
 }

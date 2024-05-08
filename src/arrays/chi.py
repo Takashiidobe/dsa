@@ -2,7 +2,7 @@ from scipy.stats import chi2
 
 # Number of outcomes and total tests
 num_outcomes = 24
-total_tests = 10000
+total_tests = 100000
 
 # Expected frequency for each outcome
 expected_frequency = total_tests / num_outcomes
